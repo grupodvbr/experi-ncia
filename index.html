@@ -26,36 +26,37 @@ body {
   align-items:center;
   justify-content:center;
   min-height:100vh;
-  padding:20px;
+  padding:30px;
 }
 .logo{
-  width:130px;
-  margin-bottom:12px;
+  width:140px;
+  margin-bottom:14px;
   border-radius:50%;
   box-shadow:0 0 20px rgba(184,134,11,.3);
 }
 h1{
-  font-size:1.2rem;
+  font-size:1.3rem;
   font-weight:700;
   color:var(--accent);
   margin-bottom:6px;
+  text-align:center;
 }
 p.intro{
-  font-size:.9rem;
+  font-size:.95rem;
   color:var(--muted);
   text-align:center;
-  margin-bottom:18px;
-  max-width:340px;
-  line-height:1.5;
+  margin-bottom:22px;
+  max-width:460px;
+  line-height:1.6;
 }
 form{
-  width:min(400px,94vw);
+  width:min(500px,95vw);
   background:var(--card);
-  border-radius:16px;
-  padding:20px;
+  border-radius:20px;
+  padding:28px;
   box-shadow:0 6px 25px rgba(0,0,0,.5);
   display:grid;
-  gap:16px;
+  gap:18px;
 }
 label{
   font-weight:600;
@@ -71,7 +72,7 @@ textarea,input{
   border:1px solid var(--line);
   background:#0f131c;
   color:var(--text);
-  font-size:15px;
+  font-size:16px;
   resize:none;
   outline:none;
   transition:border-color .2s,box-shadow .2s;
@@ -85,8 +86,8 @@ textarea:focus,input:focus{
   color:#fff;
   border:none;
   border-radius:10px;
-  padding:12px;
-  font-size:1rem;
+  padding:14px;
+  font-size:1.05rem;
   font-weight:700;
   cursor:pointer;
   transition:.2s;
@@ -104,7 +105,7 @@ textarea:focus,input:focus{
   border:4px solid rgba(255,255,255,.2);
   border-top:4px solid var(--accent);
   border-radius:50%;
-  width:48px;height:48px;
+  width:50px;height:50px;
   animation:spin 1s linear infinite;
   margin-bottom:18px;
 }
@@ -116,6 +117,11 @@ textarea:focus,input:focus{
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+@media (min-width:768px){
+  form{width:550px;padding:32px;}
+  h1{font-size:1.5rem;}
+}
 </style>
 </head>
 <body>
@@ -124,34 +130,34 @@ textarea:focus,input:focus{
 <h1>Pesquisa de Satisfação</h1>
 <p class="intro">Sua opinião é muito importante para nós!<br>Responda às perguntas abaixo e nos ajude a melhorar sua próxima experiência.</p>
 
-<form id="pesquisaForm">
+<form id="pesquisaForm" autocomplete="off">
   <div>
     <label>Qual o seu nome?</label>
-    <input type="text" name="nome" placeholder="Ex: Ana Santos" required>
+    <input type="text" name="nome" required autocomplete="off">
   </div>
   <div>
     <label>Qual cidade você é?</label>
-    <input type="text" name="cidade" placeholder="Ex: Guanambi - BA" required>
+    <input type="text" name="cidade" required autocomplete="off">
   </div>
   <div>
     <label>Quais etapas você mais gostou na sua visita?</label>
-    <textarea name="etapas" placeholder="Ex: Atendimento, cardápio, ambiente..." required></textarea>
+    <textarea name="etapas" required autocomplete="off"></textarea>
   </div>
   <div>
     <label>Qual sugestão você daria para melhorarmos?</label>
-    <textarea name="sugestao" placeholder="Ex: música ao vivo, opções de sobremesa..." required></textarea>
+    <textarea name="sugestao" required autocomplete="off"></textarea>
   </div>
   <div>
     <label>O que achou da experiência geral?</label>
-    <textarea name="experiencia" placeholder="Conte-nos como foi sua visita..." required></textarea>
+    <textarea name="experiencia" required autocomplete="off"></textarea>
   </div>
   <div>
     <label>O que achou da decoração?</label>
-    <textarea name="decoracao" placeholder="Ex: moderna, acolhedora, simples..." required></textarea>
+    <textarea name="decoracao" required autocomplete="off"></textarea>
   </div>
   <div>
     <label>Whatsapp</label>
-    <input type="tel" name="telefone" placeholder="(77) 99999-9999" required>
+    <input type="tel" name="telefone" id="telefone" maxlength="15" required autocomplete="off">
   </div>
   <button class="btn" type="submit">Enviar Resposta</button>
 </form>
@@ -168,6 +174,19 @@ const form = document.getElementById("pesquisaForm");
 const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlayText");
 const successMsg = document.getElementById("successMsg");
+const telefoneInput = document.getElementById("telefone");
+
+// Máscara de telefone (formato brasileiro)
+telefoneInput.addEventListener("input", e => {
+  let v = e.target.value.replace(/\D/g, "");
+  if (v.length > 11) v = v.slice(0, 11);
+  if (v.length > 6)
+    e.target.value = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+  else if (v.length > 2)
+    e.target.value = `(${v.slice(0,2)}) ${v.slice(2)}`;
+  else
+    e.target.value = v;
+});
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
