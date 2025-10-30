@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Pesquisa de Satisfação • Mercatto Delícia</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="https://github.com/grupodvbr/cardapiomercatto/blob/main/icons/logo.png?raw=true">
+
+<style>
+:root {
+  --bg:#0b0f19;
+  --card:#151b28;
+  --text:#ffffff;
+  --muted:#9ca3af;
+  --line:#1e2533;
+  --accent:#b8860b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body {
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:20px;
+}
+.logo{
+  width:130px;
+  margin-bottom:12px;
+  border-radius:50%;
+  box-shadow:0 0 20px rgba(184,134,11,.3);
+}
+h1{
+  font-size:1.2rem;
+  font-weight:700;
+  color:var(--accent);
+  margin-bottom:6px;
+}
+p.intro{
+  font-size:.9rem;
+  color:var(--muted);
+  text-align:center;
+  margin-bottom:18px;
+  max-width:340px;
+  line-height:1.5;
+}
+form{
+  width:min(400px,94vw);
+  background:var(--card);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 6px 25px rgba(0,0,0,.5);
+  display:grid;
+  gap:16px;
+}
+label{
+  font-weight:600;
+  font-size:.9rem;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+}
+textarea,input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#0f131c;
+  color:var(--text);
+  font-size:15px;
+  resize:none;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+textarea:focus,input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(184,134,11,.25);
+}
+.btn{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:12px;
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+.btn:hover{filter:brightness(1.1)}
+/* Overlay */
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  color:#fff;z-index:99;
+}
+#overlay.show{display:flex;animation:fadeIn .3s ease forwards;}
+.loader{
+  border:4px solid rgba(255,255,255,.2);
+  border-top:4px solid var(--accent);
+  border-radius:50%;
+  width:48px;height:48px;
+  animation:spin 1s linear infinite;
+  margin-bottom:18px;
+}
+#successMsg{
+  display:none;text-align:center;font-size:1.1rem;
+  animation:fadeInUp .5s ease forwards;
+}
+#successMsg.show{display:block;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<img class="logo" src="https://github.com/grupodvbr/cardapiomercatto/blob/main/icons/logo.png?raw=true" alt="Mercatto Delícia">
+<h1>Pesquisa de Satisfação</h1>
+<p class="intro">Sua opinião é muito importante para nós!<br>Responda às perguntas abaixo e nos ajude a melhorar sua próxima experiência.</p>
+
+<form id="pesquisaForm">
+  <div>
+    <label>📍 Qual cidade você é?</label>
+    <input type="text" name="cidade" placeholder="Ex: Guanambi - BA" required>
+  </div>
+  <div>
+    <label>🎉 Quais etapas você mais gostou na sua visita?</label>
+    <textarea name="etapas" placeholder="Ex: Atendimento, cardápio, ambiente..." required></textarea>
+  </div>
+  <div>
+    <label>💡 Qual sugestão você daria para melhorarmos?</label>
+    <textarea name="sugestao" placeholder="Ex: música ao vivo, opções de sobremesa..." required></textarea>
+  </div>
+  <div>
+    <label>⭐ O que achou da experiência geral?</label>
+    <textarea name="experiencia" placeholder="Conte-nos como foi sua visita..." required></textarea>
+  </div>
+  <div>
+    <label>🎀 O que achou da decoração?</label>
+    <textarea name="decoracao" placeholder="Ex: moderna, acolhedora, simples..." required></textarea>
+  </div>
+  <div>
+    <label>📞 Telefone para contato</label>
+    <input type="tel" name="telefone" placeholder="(77) 99999-9999" required>
+  </div>
+  <button class="btn" type="submit">Enviar Resposta</button>
+</form>
+
+<div id="overlay">
+  <div class="loader"></div>
+  <div id="overlayText">Enviando sua resposta...</div>
+  <div id="successMsg">🎉 Obrigado por participar!<br>Suas respostas foram registradas com sucesso.</div>
+</div>
+
+<script>
+const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwxRTf0nFjFTgOLF2BeIjIIoGUZwwUQMVg1r32JbEvIRje7mFAbzv6QkL-MhVllqgxs/exec";
+const form = document.getElementById("pesquisaForm");
+const overlay = document.getElementById("overlay");
+const overlayText = document.getElementById("overlayText");
+const successMsg = document.getElementById("successMsg");
+
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  overlay.classList.add("show");
+  overlayText.textContent = "Enviando sua resposta...";
+  successMsg.classList.remove("show");
+
+  const fd = new FormData(form);
+  const params = new URLSearchParams(fd);
+
+  try {
+    const res = await fetch(GAS_ENDPOINT, { method: "POST", body: params });
+    if (res.ok) {
+      overlayText.textContent = "";
+      successMsg.classList.add("show");
+      form.reset();
+      setTimeout(() => overlay.classList.remove("show"), 4000);
+    } else {
+      overlayText.textContent = "❌ Erro ao enviar. Tente novamente.";
+      setTimeout(() => overlay.classList.remove("show"), 3000);
+    }
+  } catch {
+    overlayText.textContent = "⚠️ Falha de conexão. Verifique sua internet.";
+    setTimeout(() => overlay.classList.remove("show"), 3000);
+  }
+});
+</script>
+</body>
+</html>
